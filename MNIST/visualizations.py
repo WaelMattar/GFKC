@@ -54,6 +54,23 @@ def plot_log_w_hist(log_weights, agent_ids, save_path='Figures/log_w_hist.pdf'):
     fig.tight_layout()
     fig.savefig(save_path, bbox_inches='tight')
 
+def plot_sharpening_sum_effect(results, save_path='Figures/sharpening_sum_effect.pdf'):
+    fig, axes = plt.subplots(1, len(results), figsize=(5 * len(results), 4))
+    for ax, (pow_value, log_weights, agent_ids) in zip(axes, results):
+        first_agent_log_weights = log_weights[agent_ids == 0]
+        second_agent_log_weights = log_weights[agent_ids == 1]
+        ax.hist([first_agent_log_weights, second_agent_log_weights],
+                bins=len(log_weights),
+                color=['skyblue', 'magenta'],
+                label=['first agent', 'second agent'],
+                edgecolor='black',
+                linewidth=0.2)
+        ax.set_xlabel(f'pow = {pow_value:g}', fontsize=16)
+        ax.tick_params(axis='both', labelsize=16)
+        ax.legend()
+    fig.tight_layout()
+    fig.savefig(save_path, bbox_inches='tight')
+
 def plot_log_w_vs_reward(log_weights, rewards, agent_ids, save_path='Figures/log_w_vs_reward.pdf'):
     AGENT_COLORS = ['cyan', 'magenta']
     fig, ax = plt.subplots()
