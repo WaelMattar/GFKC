@@ -48,7 +48,8 @@ for ax, kappa in zip(axes, KAPPAS):
     ax.contourf(Gx, Gy, density, levels=30, cmap='viridis')
     _style_ax(ax)
     ax.set_ylabel('')
-    ax.set_xlabel(rf'$\kappa = {kappa:g}$', fontsize=16)
+    ax.set_xlabel(rf'$\kappa = {kappa:g}$', fontsize=26)
+    ax.tick_params(axis='both', labelsize=16)
     print(f"  kappa = {kappa:<10g} ESS = {1.0 / (w**2).sum():.1f} / {N_SAMPLE}")
 
 fig.tight_layout()

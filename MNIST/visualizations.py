@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
+from scipy.stats import gaussian_kde
 
 mpl.rcParams['font.family'] = 'serif'
 mpl.rcParams['font.serif'] = ['Times New Roman']
@@ -40,17 +41,59 @@ def plot_all_particles(samples, log_weights, agent_ids, rewards, save_path='Figu
     fig.savefig(save_path, bbox_inches='tight')
 
 def plot_log_w_hist(log_weights, agent_ids, save_path='Figures/log_w_hist.pdf'):
-    fig = plt.figure()
-    first_agent_log_weights = log_weights[agent_ids == 0]
-    second_agent_log_weights = log_weights[agent_ids == 1]
-    plt.hist([first_agent_log_weights, second_agent_log_weights],
-             bins=len(log_weights),
-             color=['skyblue', 'magenta'],
-             label=['first agent', 'second agent'],
-             edgecolor='black',
-             linewidth=0.2)
-    plt.title('Histogram of log weights')
-    plt.legend()
+    fig, ax = plt.subplots()
+    AGENT_COLORS = ['cyan', 'magenta']
+    groups = [log_weights[agent_ids == 0], log_weights[agent_ids == 1]]
+    bin_edges = np.histogram_bin_edges(log_weights, bins=len(log_weights))
+    bin_width = bin_edges[1] - bin_edges[0]
+
+    FORCE_THRESHOLD = 10
+    FORCE_FRACTION = 0.1
+
+    # Natural per-agent bar heights under plain fraction-of-count normalization (weight = 1/n).
+    counts_n_peak = []
+    for data in groups:
+        n = len(data)
+        peak = np.histogram(data, bins=bin_edges)[0].max() / n if n > 0 else 0.0
+        counts_n_peak.append((n, peak))
+
+    # FIGURE_HEIGHT is set by the well-sampled agent(s); a sparse agent's bars are then
+    # forcibly rescaled so its own tallest bar sits at FORCE_FRACTION of that height,
+    # instead of towering over (or vanishing next to) the well-sampled agent's histogram.
+    big_peaks = [peak for n, peak in counts_n_peak if n >= FORCE_THRESHOLD]
+    FIGURE_HEIGHT = max(big_peaks) if big_peaks else max(peak for _, peak in counts_n_peak)
+
+    scales = [(FORCE_FRACTION * FIGURE_HEIGHT) / peak if n < FORCE_THRESHOLD and peak > 0 else 1.0
+              for n, peak in counts_n_peak]
+    weights = [np.full(n, scale / n) if n > 0 else np.array([])
+               for (n, _), scale in zip(counts_n_peak, scales)]
+    ax.hist(groups,
+            bins=bin_edges,
+            color=AGENT_COLORS,
+            label=['First agent', 'Second agent'],
+            weights=weights)
+
+    STD_FALLBACK = 0.01 * (log_weights.max() - log_weights.min())
+    xs = np.linspace(log_weights.min(), log_weights.max(), 500)
+    for data, color, (n, _), scale in zip(groups, AGENT_COLORS, counts_n_peak, scales):
+        if n == 0:
+            continue
+        if n >= FORCE_THRESHOLD and np.std(data) > 0:
+            density = gaussian_kde(data, bw_method=0.1)(xs)
+        else:
+            # Too few samples for a data-driven bandwidth (n=1 has no variance at all) --
+            # place a fixed-width Gaussian per sample instead, then rescale it by the
+            # same forced factor as this agent's bars, to stay visually consistent.
+            density = np.zeros_like(xs)
+            for mu in data:
+                density += np.exp(-0.5 * ((xs - mu) / STD_FALLBACK) ** 2) / (STD_FALLBACK * np.sqrt(2 * np.pi))
+            density /= n
+        # Scale the density by bin_width to match the bar heights' fraction-per-bin scale.
+        ax.plot(xs, density * bin_width * scale, color=color, linewidth=3)
+    # ax.set_title('Histogram of log weights')
+    ax.set_yticks([])
+    ax.tick_params(axis='x', labelsize=16)
+    ax.legend(fontsize=16)
     fig.tight_layout()
     fig.savefig(save_path, bbox_inches='tight')
 
@@ -65,7 +108,7 @@ def plot_sharpening_sum_effect(results, save_path='Figures/sharpening_sum_effect
                 label=['first agent', 'second agent'],
                 edgecolor='black',
                 linewidth=0.2)
-        ax.set_xlabel(f'pow = {pow_value:g}', fontsize=16)
+        ax.set_xlabel(f'pow = {pow_value:g}', fontsize=26)
         ax.tick_params(axis='both', labelsize=16)
         ax.legend()
     fig.tight_layout()

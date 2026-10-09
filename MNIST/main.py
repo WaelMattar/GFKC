@@ -29,7 +29,7 @@ H1_VARIANT       = "ratio"   # "ratio" or "sum"
 log_h1_fn, dlog_p_dlog_h1_fn = H1_VARIANTS[H1_VARIANT]
 
 # Steering parameters
-STEERING         = True
+STEERING         = False
 KAPPA            = 0.000001
 STEERING_TIMES   = {round(0.02 * k, 2) for k in range(51)} if STEERING else None
 
