@@ -19,7 +19,7 @@ LINESTYLES = {"ratio": "-", "symmetric": "--"}
 
 # Per-agent particle counts to sweep (total particles passed to sample_FK is 2x each value,
 # matching main.py's convention: N_SAMPLE = per_agent_count * 2).
-PER_AGENT_SIZES = [20_000, 50_000, 75_000, 100_000, 200_000, 500_000, 700_000, 1_000_000, 1_200_000, 1_500_000, 1_700_000, 2_000_000]
+PER_AGENT_SIZES = [20_000, 35_000, 50_000, 75_000, 100_000, 150_000, 200_000, 500_000, 700_000, 850_000, 1_000_000, 1_200_000, 1_500_000, 1_700_000, 2_000_000]
 
 os.makedirs('Figures', exist_ok=True)
 
@@ -128,10 +128,10 @@ if __name__ == '__main__':
         labels  += [h_l2.get_label(), h_kl.get_label()]
 
     ax1.set_xscale('log')
-    ax1.set_xlabel('particles per agent')
-    ax1.set_ylabel(r'$\|\mathrm{true} - \mathrm{FK}\|_2$', color='black')
+    # ax1.set_xlabel('particles per agent')
+    ax1.set_ylabel(r'$\|h_1 - \widehat{h}_1\|_2$', color='black')
     ax1.tick_params(axis='y', color='black', labelcolor='black')
-    ax2.set_ylabel(r'KL(true $\Vert$ FK)', color='black')
+    ax2.set_ylabel(r'KL($h_1 \Vert \widehat{h}_1$)', color='black')
     ax2.tick_params(axis='y', color='black', labelcolor='black')
 
     ax1.legend(handles, labels, ncol=2, loc='upper right')
