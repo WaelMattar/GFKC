@@ -98,7 +98,7 @@ for ax, (pow_value, log_weights, agent_ids) in zip(axes.ravel(), results):
             density /= n
         ax.plot(xs, density * bin_width * scale, color=color, linewidth=3)
 
-    ax.set_xlabel(f'pow = {pow_value:g}', fontsize=20)
+    ax.set_xlabel(rf'$\gamma = {pow_value:g}$', fontsize=20)
     ax.set_yticks([])
     ax.tick_params(axis='x', labelsize=20)
     if pow_value == POW_VALUES[0]:
