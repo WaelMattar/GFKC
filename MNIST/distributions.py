@@ -30,7 +30,7 @@ def dlog_p_dlog_h0(log_p):
 
 def log_h1_ratio(log_p):
     # h1 = p_1 / (1 + C*p_2)
-    # TARGET distribution: favors agent 1 (digit "1") over agent 2.
+    # TARGET distribution: favors agent 1 over agent 2.
     return log_p[0] - F.softplus(log_p[1] + LOG_C)
 
 def dlog_p_dlog_h1_ratio(log_p):
