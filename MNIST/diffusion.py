@@ -81,6 +81,30 @@ class DiffusionModel:
             if it % print_every == 0:
                 pbar.set_postfix(loss=f"{loss.item():.4f}")
 
+    def train_balanced(self, data_a, data_b, n_iters=10000, batch_size=512, lr=2e-4, print_every=5000):
+        # Draws each minibatch as an equal split between two class pools, so both
+        # classes get exactly equal sampling probability regardless of their raw counts.
+        data_a = data_a.to(self.device)
+        data_b = data_b.to(self.device)
+        half_a = batch_size // 2
+        half_b = batch_size - half_a
+        opt = torch.optim.Adam(self.net.parameters(), lr=lr)
+        self.net.train()
+        pbar = tqdm(range(1, n_iters + 1), desc="training")
+        for it in pbar:
+            idx_a = torch.randint(len(data_a), (half_a,), device=self.device)
+            idx_b = torch.randint(len(data_b), (half_b,), device=self.device)
+            x0 = torch.cat([data_a[idx_a], data_b[idx_b]], dim=0)
+            t = torch.rand(batch_size, 1, device=self.device).clamp(1e-3, 1.0 - 1e-3)
+            eps = torch.randn_like(x0)
+            xt = torch.exp(_log_alpha(t)) * x0 + _sigma(t) * eps
+            loss = ((eps + self.net(1.0 - t, xt)) ** 2).mean()  # net is parametrized in u = 1 - t
+            opt.zero_grad()
+            loss.backward()
+            opt.step()
+            if it % print_every == 0:
+                pbar.set_postfix(loss=f"{loss.item():.4f}")
+
     def load(self, path):
         self.net.load_state_dict(torch.load(path, map_location=self.device))
         self.net.eval()
