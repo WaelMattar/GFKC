@@ -128,7 +128,7 @@ if __name__ == '__main__':
         labels  += [h_l2.get_label(), h_kl.get_label()]
 
     ax1.set_xscale('log')
-    # ax1.set_xlabel('particles per agent')
+    ax1.set_xlabel('particles per agent')
     ax1.set_ylabel(r'$\|h_1 - \widehat{h}_1\|_2$', color='black')
     ax1.tick_params(axis='y', color='black', labelcolor='black')
     ax2.set_ylabel(r'KL($h_1 \Vert \widehat{h}_1$)', color='black')

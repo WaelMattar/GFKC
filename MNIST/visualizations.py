@@ -129,9 +129,10 @@ def plot_log_w_vs_reward(log_weights, rewards, agent_ids, save_path='Figures/log
     # ss_tot = np.sum((rewards - rewards.mean()) ** 2)
     # r2 = 1 - ss_res / ss_tot
     # ax.plot(x_line, y_line, color='red', linewidth=2, label=f'$R^2$ = {r2:.3f}')
-    ax.set_xlabel('log weights')
-    ax.set_ylabel('reward value')
-    ax.legend()
+    ax.set_xlabel('log weights', fontsize=16)
+    ax.set_ylabel('reward value', fontsize=16)
+    ax.tick_params(axis='both', labelsize=16)
+    ax.legend(fontsize=16)
     fig.tight_layout()
     fig.savefig(save_path, bbox_inches='tight')
 

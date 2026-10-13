@@ -11,7 +11,7 @@ DIGITS_2 = [1, 7]
 DIM = 784
 C = 100
 LOG_C = math.log(C)
-H1_SUM_POW = 2.5
+H1_SUM_POW = 1
 
 def load_agent_data(digits):
     ds = datasets.MNIST(root='./data', train=True, download=True)
