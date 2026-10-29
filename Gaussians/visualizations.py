@@ -42,7 +42,7 @@ def _style_ax(ax):
 
 
 def plot_comparison(combined, true_pdf, h1_label=r'$h_1(x)$'):
-    error = np.abs(true_pdf - combined)
+    error = np.abs(true_pdf - combined) / true_pdf.max()
     fig, (ax_p, ax_q, ax_e) = plt.subplots(1, 3, figsize=(16, 5))
     ax_p.contourf(Gx, Gy, true_pdf, levels=30, cmap='viridis')
     # ax_p.set_title('True $h_1(x)$')
